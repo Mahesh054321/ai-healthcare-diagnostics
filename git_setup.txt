@@ -1,0 +1,183 @@
+ai-healthcare-diagnostics/
+│
+├── README.md
+├── requirements.txt
+├── .gitignore
+│
+├── data/
+│   ├── raw/
+│   ├── processed/
+│   └── sample/
+│
+├── notebooks/
+│   ├── data_exploration.ipynb
+│   └── model_experiments.ipynb
+│
+├── src/
+│   ├── __init__.py
+│   ├── data_preprocessing.py
+│   ├── feature_engineering.py
+│   ├── model_training.py
+│   ├── model_evaluation.py
+│   └── inference.py
+│
+├── models/
+│   └── trained_models/
+│
+├── explainability/
+│   ├── shap_analysis.py
+│   └── lime_analysis.py
+│
+├── api/
+│   ├── app.py
+│   └── routes.py
+│
+├── frontend/
+│   └── streamlit_app.py
+│
+├── deployment/
+│   ├── docker/
+│   ├── aws/
+│   └── azure/
+│
+├── docs/
+│   ├── problem_statement.md
+│   ├── architecture.md
+│   └── results.md
+│
+└── progress/
+    ├── week1.md
+    ├── week2.md
+    └── week3.md
+
+
+🧠 WHAT EACH FOLDER MEANS (VERY SIMPLE)
+📁 data/
+
+raw/ → original dataset (not uploaded)
+
+processed/ → cleaned data
+
+sample/ → small CSV for GitHub (safe)
+
+📁 notebooks/
+
+For:
+
+learning
+
+experiments
+
+understanding data
+(Teachers LOVE this folder)
+
+📁 src/
+
+Clean, reusable Python code
+(Industry standard)
+
+📁 models/
+
+Saved trained models
+(Usually ignored in .gitignore)
+
+📁 explainability/
+
+Explainable AI:
+
+SHAP
+
+LIME
+(Big plus for your project)
+
+📁 api/
+
+Backend (FastAPI/Flask)
+
+Model serving
+
+Prediction endpoint
+
+📁 frontend/
+
+UI (Streamlit)
+
+Input patient data
+
+Show prediction
+
+📁 deployment/
+
+Cloud & DevOps:
+
+Docker
+
+AWS
+
+Azure
+
+📁 docs/
+
+Written explanation:
+
+Problem
+
+Architecture
+
+Results
+(Very important for college)
+
+📁 progress/
+
+Weekly progress tracking
+(Teachers cannot complain if this exists)
+
+✅ REQUIRED FILES (DO NOT SKIP)
+README.md
+
+Project overview
+
+.gitignore
+
+Ignore:
+
+datasets
+
+models
+
+env files
+
+LICENSE
+
+MIT License (already correct)
+
+requirements.txt
+
+All Python libraries
+
+🎯 COMMIT MESSAGE GUIDELINE (FINAL)
+Action	Commit Message
+Create folders	chore: initialize project structure
+Add README	docs: add initial README
+Add dataset sample	data: add diabetes sample dataset
+Add notebook	notebooks: add data exploration notebook
+Add model	model: add baseline classifier
+Add XAI	xai: add shap explainability
+🚀 WHAT YOU SHOULD DO NEXT (CLEAR)
+RIGHT NOW:
+
+Fix folder names (deployment, notebooks)
+
+Add requirements.txt
+
+Add data/sample/diabetes_sample.csv
+
+NEXT (I will help):
+
+ML model (step-by-step)
+
+Explainable AI
+
+API
+
+Deployment
