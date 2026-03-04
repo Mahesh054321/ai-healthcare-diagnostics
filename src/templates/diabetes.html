@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Diabetes Prediction</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f2f2f2;
+text-align:center;
+}
+
+.container{
+background:white;
+width:400px;
+margin:auto;
+padding:30px;
+margin-top:50px;
+border-radius:10px;
+box-shadow:0px 0px 10px gray;
+}
+
+input{
+width:90%;
+padding:10px;
+margin:8px;
+}
+
+button{
+padding:10px 20px;
+background:#27ae60;
+color:white;
+border:none;
+border-radius:5px;
+}
+
+.result{
+margin-top:20px;
+font-size:20px;
+color:red;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Diabetes Prediction</h2>
+
+<form method="POST">
+
+<input type="text" name="pregnancies" placeholder="Pregnancies" required>
+
+<input type="text" name="glucose" placeholder="Glucose Level" required>
+
+<input type="text" name="bloodpressure" placeholder="Blood Pressure" required>
+
+<input type="text" name="skinthickness" placeholder="Skin Thickness" required>
+
+<input type="text" name="insulin" placeholder="Insulin Level" required>
+
+<input type="text" name="bmi" placeholder="BMI" required>
+
+<input type="text" name="dpf" placeholder="Diabetes Pedigree Function" required>
+
+<input type="text" name="age" placeholder="Age" required>
+
+<button type="submit">Predict</button>
+
+</form>
+
+{% if prediction %}
+<div class="result">
+{{prediction}}
+</div>
+{% endif %}
+
+<br>
+<a href="/">Back</a>
+
+</div>
+
+</body>
+</html>
