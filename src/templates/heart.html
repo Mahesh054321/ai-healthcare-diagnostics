@@ -93,8 +93,14 @@ color:red;
 
 {% if prediction %}
 <div class="result">
-{{prediction}}
+<b>Prediction:</b> {{prediction}}
 </div>
+
+<div style="margin-top:15px;color:#333;font-size:16px;">
+<b>AI Explanation:</b>
+<p>{{ explanation }}</p>
+</div>
+
 {% endif %}
 
 <br>

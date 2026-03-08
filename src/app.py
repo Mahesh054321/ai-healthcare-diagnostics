@@ -1,6 +1,38 @@
 from flask import Flask, render_template, request
 import numpy as np
 import joblib
+from generative_ai.explainer import generate_diabetes_explanation, generate_heart_explanation
+from explainable_ai.shap_explainer import explain_heart, explain_diabetes
+
+
+# FEATURES
+
+diabetes_features = [
+"pregnancies",
+"glucose",
+"bloodpressure",
+"skinthickness",
+"insulin",
+"bmi",
+"dpf",
+"age"
+]
+
+heart_features = [
+"age",
+"sex",
+"cp",
+"trestbps",
+"chol",
+"fbs",
+"restecg",
+"thalach",
+"exang",
+"oldpeak",
+"slope",
+"ca",
+"thal"
+]
 
 app = Flask(__name__)
 
@@ -36,7 +68,12 @@ def diabetes():
         else:
             result = "No Diabetes"
 
-        return render_template("diabetes.html", prediction=result)
+        shap_values = explain_diabetes(features[0], diabetes_features)    
+
+        patient_data = request.form.to_dict()
+        explanation = generate_diabetes_explanation(result, patient_data)
+
+        return render_template("diabetes.html", prediction=result, explanation=explanation)
 
     return render_template("diabetes.html")
 
@@ -69,12 +106,17 @@ def heart():
 
         prediction = heart_model.predict(scaled)
 
-        if prediction[0] == 1:
+        if prediction[0] == 0:
             result = "Heart Disease Detected"
         else:
             result = "No Heart Disease"
 
-        return render_template("heart.html", prediction=result)
+        shap_values = explain_heart(features[0], heart_features)
+
+        patient_data = request.form.to_dict()
+        explanation = generate_heart_explanation(result, patient_data)            
+
+        return render_template("heart.html", prediction=result, explanation=explanation)
 
     return render_template("heart.html")
 
