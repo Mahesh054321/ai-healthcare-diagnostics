@@ -1,44 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Heart Disease Prediction</title>
+
+<title>DR’s AI Heart Risk Assessment</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
 
 body{
-font-family:Arial;
-background:#f2f2f2;
-text-align:center;
+background: linear-gradient(to right,#e3f2fd,#ffffff);
+font-family:Segoe UI;
 }
 
-.container{
-background:white;
-width:450px;
-margin:auto;
-padding:30px;
-margin-top:40px;
-border-radius:10px;
-box-shadow:0px 0px 10px gray;
+.card{
+border-radius:20px;
+box-shadow:0px 10px 30px rgba(0,0,0,0.2);
 }
 
-input{
-width:90%;
-padding:10px;
-margin:6px;
-}
-
-button{
-padding:10px 20px;
-background:#e74c3c;
+.header{
+background:#0d6efd;
 color:white;
-border:none;
-border-radius:5px;
-}
-
-.result{
-margin-top:20px;
-font-size:20px;
-color:red;
+padding:20px;
+text-align:center;
 }
 
 </style>
@@ -47,64 +31,91 @@ color:red;
 
 <body>
 
-<div class="container">
+<div class="header">
+<h2>❤️ DR’s AI Heart Disease Risk Assessment</h2>
+</div>
 
-<h2>Heart Disease Prediction</h2>
+<div class="container mt-5">
 
-<form method="POST">
+<form method="POST" target="_blank">
 
-<input type="text" name="age" placeholder="Age" required>
+<div class="card p-4">
+
+<label>Age</label>
+<input type="number" name="age" class="form-control" min="18" max="100" required>
 
 <label>Sex</label>
-<select name="sex">
+<select name="sex" class="form-control">
 <option value="1">Male</option>
 <option value="0">Female</option>
 </select>
 
-<input type="text" name="cp" placeholder="Chest Pain Type" required>
+<label>Chest Pain Type</label>
+<select name="cp" class="form-control">
+<option value="0">Typical Angina</option>
+<option value="1">Atypical Angina</option>
+<option value="2">Non-Anginal Pain</option>
+<option value="3">Asymptomatic</option>
+</select>
 
-<input type="text" name="trestbps" placeholder="Resting Blood Pressure" required>
+<label>Resting Blood Pressure</label>
+<input type="number" name="trestbps" class="form-control" min="80" max="200" required>
 
-<input type="text" name="chol" placeholder="Cholesterol" required>
+<label>Cholesterol Level</label>
+<input type="number" name="chol" class="form-control" min="100" max="600" required>
 
-<input type="text" name="fbs" placeholder="Fasting Blood Sugar" required>
+<label>Fasting Blood Sugar</label>
+<select name="fbs" class="form-control">
+<option value="1">Greater than 120 mg/dl</option>
+<option value="0">Less than 120 mg/dl</option>
+</select>
 
-<input type="text" name="restecg" placeholder="Rest ECG" required>
+<label>Rest ECG Result</label>
+<select name="restecg" class="form-control">
+<option value="0">Normal</option>
+<option value="1">ST-T Abnormality</option>
+<option value="2">Left Ventricular Hypertrophy</option>
+</select>
 
-<input type="text" name="thalach" placeholder="Max Heart Rate" required>
+<label>Max Heart Rate Achieved</label>
+<input type="number" name="thalach" class="form-control" min="60" max="220" required>
 
-<label>Exercise Angina</label>
-<select name="exang">
+<label>Exercise Induced Angina</label>
+<select name="exang" class="form-control">
 <option value="1">Yes</option>
 <option value="0">No</option>
 </select>
 
-<input type="text" name="oldpeak" placeholder="Oldpeak" required>
+<label>Old Peak (ST depression)</label>
+<input type="number" step="0.1" name="oldpeak" class="form-control" min="0" max="6" required>
 
-<input type="text" name="slope" placeholder="Slope" required>
+<label>Slope</label>
+<select name="slope" class="form-control">
+<option value="0">Upsloping</option>
+<option value="1">Flat</option>
+<option value="2">Downsloping</option>
+</select>
 
-<input type="text" name="ca" placeholder="Major Vessels" required>
+<label>Number of Major Vessels</label>
+<select name="ca" class="form-control">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+</select>
 
-<input type="text" name="thal" placeholder="Thalassemia" required>
+<label>Thalassemia</label>
+<select name="thal" class="form-control">
+<option value="1">Normal</option>
+<option value="2">Fixed Defect</option>
+<option value="3">Reversible Defect</option>
+</select>
 
-<button type="submit">Predict</button>
+<button class="btn btn-danger mt-4 w-100">Analyze Heart Risk</button>
+
+</div>
 
 </form>
-
-{% if prediction %}
-<div class="result">
-<b>Prediction:</b> {{prediction}}
-</div>
-
-<div style="margin-top:15px;color:#333;font-size:16px;">
-<b>AI Explanation:</b>
-<p>{{ explanation }}</p>
-</div>
-
-{% endif %}
-
-<br>
-<a href="/">Back</a>
 
 </div>
 

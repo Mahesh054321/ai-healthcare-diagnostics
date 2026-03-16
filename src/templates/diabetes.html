@@ -1,94 +1,34 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Diabetes Prediction</title>
+<form method="POST" target="_blank">
 
-<style>
+<div class="card p-4 shadow-lg">
 
-body{
-font-family:Arial;
-background:#f2f2f2;
-text-align:center;
-}
+<h3 class="text-success text-center">🍬 Diabetes Risk Assessment</h3>
 
-.container{
-background:white;
-width:400px;
-margin:auto;
-padding:30px;
-margin-top:50px;
-border-radius:10px;
-box-shadow:0px 0px 10px gray;
-}
+<label>Pregnancies</label>
+<input type="number" name="pregnancies" class="form-control" min="0" max="20" required>
 
-input{
-width:90%;
-padding:10px;
-margin:8px;
-}
+<label>Glucose Level</label>
+<input type="number" name="glucose" class="form-control" min="50" max="300" required>
 
-button{
-padding:10px 20px;
-background:#27ae60;
-color:white;
-border:none;
-border-radius:5px;
-}
+<label>Blood Pressure</label>
+<input type="number" name="bloodpressure" class="form-control" min="40" max="180" required>
 
-.result{
-margin-top:20px;
-font-size:20px;
-color:red;
-}
+<label>Skin Thickness</label>
+<input type="number" name="skinthickness" class="form-control" min="0" max="100" required>
 
-</style>
+<label>Insulin</label>
+<input type="number" name="insulin" class="form-control" min="0" max="900" required>
 
-</head>
+<label>BMI</label>
+<input type="number" step="0.1" name="bmi" class="form-control" min="10" max="60" required>
 
-<body>
+<label>Diabetes Pedigree Function</label>
+<input type="number" step="0.01" name="dpf" class="form-control" min="0" max="3" required>
 
-<div class="container">
+<label>Age</label>
+<input type="number" name="age" class="form-control" min="10" max="100" required>
 
-<h2>Diabetes Prediction</h2>
+<button class="btn btn-success w-100 mt-3">Analyze Risk</button>
 
-<form method="POST">
-
-<input type="text" name="pregnancies" placeholder="Pregnancies" required>
-
-<input type="text" name="glucose" placeholder="Glucose Level" required>
-
-<input type="text" name="bloodpressure" placeholder="Blood Pressure" required>
-
-<input type="text" name="skinthickness" placeholder="Skin Thickness" required>
-
-<input type="text" name="insulin" placeholder="Insulin Level" required>
-
-<input type="text" name="bmi" placeholder="BMI" required>
-
-<input type="text" name="dpf" placeholder="Diabetes Pedigree Function" required>
-
-<input type="text" name="age" placeholder="Age" required>
-
-<button type="submit">Predict</button>
-
+</div>
 </form>
-
-{% if prediction %}
-<div class="result">
-<b>Prediction:</b> {{prediction}}
-</div>
-
-<div style="margin-top:15px;color:#333;font-size:16px;">
-<b>AI Explanation:</b>
-<p>{{ explanation }}</p>
-</div>
-
-{% endif %}
-
-<br>
-<a href="/">Back</a>
-
-</div>
-
-</body>
-</html>
