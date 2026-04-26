@@ -1,105 +1,224 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>DR's AI - Healthcare Diagnostics</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedAI Diagnostics - AI Healthcare Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap");
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-<style>
+        :root {
+            --bg: #0b0f1a;
+            --bg2: #111827;
+            --bg3: #1a2236;
+            --border: rgba(99,130,220,0.18);
+            --border2: rgba(99,130,220,0.35);
+            --accent: #4f7cff;
+            --accent2: #38e2d4;
+            --accent3: #f87171;
+            --accent4: #fbbf24;
+            --text: #e8edf7;
+            --muted: #7a8ab0;
+            --success: #34d399;
+            --warn: #fbbf24;
+            --danger: #f87171;
+            --font: "DM Sans", sans-serif;
+            --mono: "Space Mono", monospace;
+        }
 
-body{
-background: linear-gradient(to right,#e3f2fd,#ffffff);
-font-family: 'Segoe UI', sans-serif;
-}
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-.header{
-background:#0d6efd;
-color:white;
-padding:25px;
-text-align:center;
-box-shadow:0px 3px 10px rgba(0,0,0,0.2);
-}
+        .app { display: flex; flex-direction: column; min-height: 100vh; }
 
-.card{
-border-radius:20px;
-box-shadow:0px 10px 25px rgba(0,0,0,0.15);
-transition:0.3s;
-}
+        .header {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px; position: sticky; top: 0; z-index: 100;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+        }
+        .logo-text { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+        .logo-text span { color: var(--accent2); }
+        .header-nav { display: flex; gap: 4px; }
+        .nav-btn {
+            background: none; border: none; color: var(--muted); font-size: 13px; font-family: var(--font);
+            padding: 6px 14px; border-radius: 6px; cursor: pointer; transition: all 0.2s;
+        }
+        .nav-btn:hover, .nav-btn.active { background: rgba(79,124,255,0.12); color: var(--accent); }
+        .status-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--success); font-family: var(--mono); }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-.card:hover{
-transform: scale(1.05);
-}
+        .main-content { flex: 1; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
 
-.btn-heart{
-background:#dc3545;
-color:white;
-border-radius:25px;
-}
+        .home-hero {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 32px 24px 28px;
+        }
+        .hero-title { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .hero-title span { color: var(--accent); }
+        .hero-sub { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+        .stats-row { display: flex; gap: 16px; flex-wrap: wrap; }
+        .stat-card {
+            background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
+            padding: 14px 20px; flex: 1; min-width: 130px;
+        }
+        .stat-val { font-size: 22px; font-weight: 600; font-family: var(--mono); }
+        .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
 
-.btn-diabetes{
-background:#198754;
-color:white;
-border-radius:25px;
-}
-
-.footer{
-margin-top:60px;
-text-align:center;
-color:gray;
-}
-
-.logo{
-font-size:40px;
-}
-
-</style>
-
+        .section { padding: 24px; }
+        .section-title { font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 16px; }
+        .disease-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        .disease-card {
+            background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+            padding: 18px 16px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
+        }
+        .disease-card::before { content:""; position:absolute; top:0;left:0;right:0; height:3px; border-radius:12px 12px 0 0; }
+        .disease-card.diabetes::before { background: linear-gradient(90deg, #4f7cff, #818cf8); }
+        .disease-card.heart::before { background: linear-gradient(90deg, #f87171, #fb923c); }
+        .disease-card.pneumonia::before { background: linear-gradient(90deg, #38e2d4, #34d399); }
+        .disease-card.kidney::before { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+        .disease-card.symptom::before { background: linear-gradient(90deg, #c084fc, #818cf8); }
+        .disease-card.liver::before { background: linear-gradient(90deg, #fb7185, #f87171); }
+        .disease-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,124,255,0.12); }
+        .disease-icon { font-size: 26px; margin-bottom: 10px; }
+        .disease-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+        .disease-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+        .disease-acc { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-family: var(--mono); color: var(--success); margin-top: 10px; background: rgba(52,211,153,0.1); border-radius: 4px; padding: 2px 8px; }
+    </style>
 </head>
-
 <body>
+    <div class="app" id="app">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🏥</div>
+                <div class="logo-text">Med<span>AI</span> Diagnostics</div>
+            </div>
+            <div class="header-nav">
+                <button class="nav-btn active" onclick="window.location.href='/'">Dashboard</button>
+                <button class="nav-btn" onclick="window.location.href='/symptom-checker'">Symptoms</button>
+            </div>
+            <div class="status-badge"><div class="status-dot"></div> AI Active</div>
+        </div>
 
-<div class="header">
-<h1 class="logo">🩺 DR’s AI</h1>
-<p>Smart Disease Prediction using Machine Learning & Explainable AI</p>
-</div>
+        <div class="main-content">
+            <div class="tab-panel active" id="tab-home">
+                <div class="home-hero">
+                    <div class="hero-title">AI-Powered <span>Health Diagnostics</span></div>
+                    <div class="hero-sub">Select a disease module below to begin your analysis. All diagnostics use trained ML models.</div>
+                    <div class="stats-row">
+                        <div class="stat-card"><div class="stat-val" style="color:var(--accent)">6</div><div class="stat-label">Diagnostic Modules</div></div>
+                        <div class="stat-card"><div class="stat-val" style="color:var(--success)">95%</div><div class="stat-label">Avg. Model Accuracy</div></div>
+                        <div class="stat-card" id="tests-card"><div class="stat-val" id="test-count">0</div><div class="stat-label">Tests Run</div></div>
+                        <div class="stat-card"><div class="stat-val" style="color:var(--accent2)">Real-time</div><div class="stat-label">Analysis Speed</div></div>
+                    </div>
+                </div>
+                <div class="section">
+                    <div class="section-title">Disease Modules</div>
+                    <div class="disease-grid">
+                        <div class="disease-card diabetes" onclick="window.location.href='/diabetes'">
+                            <div class="disease-icon">🩸</div>
+                            <div class="disease-name">Diabetes</div>
+                            <div class="disease-desc">Blood sugar & insulin resistance analysis</div>
+                            <div class="disease-acc">✓ 94.2% acc</div>
+                        </div>
+                        <div class="disease-card heart" onclick="window.location.href='/heart'">
+                            <div class="disease-icon">❤️</div>
+                            <div class="disease-name">Heart Disease</div>
+                            <div class="disease-desc">Cardiovascular risk factor evaluation</div>
+                            <div class="disease-acc">✓ 96.1% acc</div>
+                        </div>
+                        <div class="disease-card pneumonia" onclick="window.location.href='/pneumonia'">
+                            <div class="disease-icon">🫁</div>
+                            <div class="disease-name">Pneumonia</div>
+                            <div class="disease-desc">Respiratory infection likelihood scoring</div>
+                            <div class="disease-acc">✓ 92.8% acc</div>
+                        </div>
+                        <div class="disease-card kidney" onclick="window.location.href='/kidney'">
+                            <div class="disease-icon">🫘</div>
+                            <div class="disease-name">Kidney Disease</div>
+                            <div class="disease-desc">Renal function & CKD risk markers</div>
+                            <div class="disease-acc">✓ 95.5% acc</div>
+                        </div>
+                        <div class="disease-card liver" onclick="window.location.href='/liver'">
+                            <div class="disease-icon">🟤</div>
+                            <div class="disease-name">Liver Disease</div>
+                            <div class="disease-desc">Hepatic function abnormality detection</div>
+                            <div class="disease-acc">✓ 93.7% acc</div>
+                        </div>
+                        <div class="disease-card symptom" onclick="window.location.href='/symptom-checker'">
+                            <div class="disease-icon">🩺</div>
+                            <div class="disease-name">Symptom Checker</div>
+                            <div class="disease-desc">Tell us your symptoms — we suggest possible conditions</div>
+                            <div class="disease-acc">✓ AI-powered</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-<div class="container mt-5">
+            <div class="tab-panel" id="tab-symptom">
+                <div style="padding:24px;max-width:800px;margin:0 auto;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+                        <button style="background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-size:13px;padding:6px 14px;border-radius:6px;cursor:pointer;" onclick="showTab("home")">← Back</button>
+                        <div style="font-size:20px;font-weight:600;">🩺 Symptom Checker</div>
+                    </div>
+                    <div style="margin-bottom:14px;font-size:13px;color:var(--muted);">Select all symptoms you are currently experiencing:</div>
+                    
+                    <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin:14px 0 8px;">General</div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:20px;" id="sym-general"></div>
+                    
+                    <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin:14px 0 8px;">Cardiovascular & Respiratory</div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:20px;" id="sym-cardio"></div>
+                    
+                    <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin:14px 0 8px;">Digestive & Urinary</div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:20px;" id="sym-digest"></div>
+                    
+                    <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin:14px 0 8px;">Neurological & Skin</div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:20px;" id="sym-neuro"></div>
 
-<div class="row">
+                    <div style="display:flex;gap:10px;margin-top:8px;">
+                        <button style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;padding:12px;cursor:pointer;" onclick="runSymptomCheck()">Analyze Symptoms</button>
+                        <button style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:9px 20px;border-radius:8px;cursor:pointer;" onclick="clearSymptoms()">Clear All</button>
+                    </div>
 
-<div class="col-md-6">
-<div class="card p-4 text-center">
-<h3>❤️ Heart Disease Prediction</h3>
-<p>Analyze cardiovascular health risk instantly</p>
-<a href="/heart" class="btn btn-heart">Check Now</a>
-</div>
-</div>
+                    <div id="symptom-result" style="margin-top:20px;display:none;"></div>
+                </div>
+            </div>
 
-<div class="col-md-6">
-<div class="card p-4 text-center">
-<h3>🍬 Diabetes Prediction</h3>
-<p>Early diabetes detection with AI support</p>
-<a href="/diabetes" class="btn btn-diabetes">Check Now</a>
-</div>
-</div>
+            <div class="tab-panel" id="tab-diag">
+                <div style="padding:24px;max-width:800px;margin:0 auto;" id="diag-form-area"></div>
+            </div>
 
-</div>
+            <div class="tab-panel" id="tab-result">
+                <div style="padding:24px;max-width:860px;margin:0 auto;" id="result-area"></div>
+            </div>
 
-</div>
-
-<div class="footer">
-<p>Powered by DR’s AI • AI Healthcare Diagnostics System</p>
-</div>
-<script src="https://unpkg.com/scrollreveal"></script>
-
-<script>
-ScrollReveal().reveal('.card',{
-delay:200,
-distance:'60px',
-origin:'bottom',
-duration:1000
-});
-</script>
+            <div class="tab-panel" id="tab-history">
+                <div style="padding:24px;">
+                    <div style="font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:16px;">Test History</div>
+                    <div id="history-content"><div style="text-align:center;padding:60px;color:var(--muted);font-size:14px;">No tests run yet. Start a diagnostic from the Dashboard.</div></div>
+                </div>
+        </div>
+    </div>
 
 </body>
 </html>

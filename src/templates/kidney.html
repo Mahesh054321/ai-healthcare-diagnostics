@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kidney Disease Risk Assessment - MedAI Diagnostics</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap");
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --bg: #0b0f1a; --bg2: #111827; --bg3: #1a2236; --border: rgba(99,130,220,0.18);
+            --border2: rgba(99,130,220,0.35); --accent: #4f7cff; --accent2: #38e2d4; --accent3: #fbbf24;
+            --text: #e8edf7; --muted: #7a8ab0; --danger: #f87171; --font: "DM Sans", sans-serif; --mono: "Space Mono", monospace; }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+        .app { display: flex; flex-direction: column; min-height: 100vh; }
+        .header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex;
+            align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { font-size: 24px; } .logo-text { font-size: 18px; font-weight: 600; }
+        .nav-btn { background: transparent; border: none; color: var(--muted); padding: 8px 16px; border-radius: 8px;
+            cursor: pointer; transition: all 0.2s; font-size: 14px; text-decoration: none; }
+        .nav-btn:hover { background: var(--bg3); color: var(--text); }
+        .main { flex: 1; padding: 24px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .form-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .form-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .form-title { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+        .form-subtitle { color: var(--muted); margin-bottom: 32px; font-size: 14px; }
+        .form-group { margin-bottom: 24px; }
+        .input-label { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted);
+            margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+        .input-value { color: var(--accent3); font-family: var(--mono); font-weight: 600; }
+        .input-description { font-size: 12px; color: var(--muted); margin-top: 4px; margin-bottom: 8px; }
+        input[type="range"] { width: 100%; height: 6px; border-radius: 3px; background: linear-gradient(90deg, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.1) 100%);
+            outline: none; -webkit-appearance: none; appearance: none; cursor: pointer; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px;
+            border-radius: 50%; background: var(--accent3); cursor: pointer; box-shadow: 0 2px 8px rgba(251,191,36,0.4); transition: all 0.2s; }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(251,191,36,0.6); }
+        select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 10px 12px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        select:hover { border-color: var(--border2); }
+        select:focus { outline: none; border-color: var(--accent3); box-shadow: 0 0 8px rgba(251,191,36,0.2); }
+        .range-guide { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 6px; }
+        .submit-btn { width: 100%; background: var(--accent3); border: none; color: #fff; padding: 14px 24px; border-radius: 8px;
+            font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s; margin-top: 16px; }
+        .submit-btn:hover { background: #f5a623; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(251,191,36,0.3); }
+        .back-btn { background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 12px 24px; border-radius: 8px;
+            font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; margin-bottom: 24px; }
+        .back-btn:hover { background: var(--border); }
+        .chart-container { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+        .chart-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; color: var(--accent3); }
+        .risk-preview { background: linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(251,191,36,0.05) 100%); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; margin-top: 24px; text-align: center; }
+        .risk-value { font-size: 36px; font-weight: 700; font-family: var(--mono); color: var(--accent3); margin-bottom: 8px; }
+        .risk-label { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+        @media (max-width: 1024px) { .form-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="logo"><div class="logo-icon">🩺</div><div class="logo-text">MedAI Diagnostics</div></div>
+            <nav><a href="/" class="nav-btn">Home</a></nav>
+        </header>
+        <main class="main">
+            <a href="/" class="back-btn">← Back to Home</a>
+            <div class="form-container">
+                <div class="form-card">
+                    <div class="form-title">🫘 Kidney Disease Risk Assessment</div>
+                    <div class="form-subtitle">Evaluate your renal function and health</div>
+                    <form method="POST" id="kidneyForm">
+                        <div class="form-group">
+                            <div class="input-label"><span>Age (years)</span><span class="input-value" id="age-val">45</span></div>
+                            <div class="input-description">Your age in years</div>
+                            <input type="range" name="age" id="age" min="18" max="90" value="45" step="1">
+                            <div class="range-guide"><span>18</span><span>90</span></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-label"><span>Blood Pressure (mmHg)</span><span class="input-value" id="bp-val">120</span></div>
+                            <div class="input-description">Systolic BP - Normal: 120/80</div>
+                            <input type="range" name="bp" id="bp" min="80" max="200" value="120" step="1">
+                            <div class="range-guide"><span>80</span><span>200</span></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-label"><span>Creatinine (mg/dL)</span><span class="input-value" id="creatinine-val">1.0</span></div>
+                            <div class="input-description">Kidney function marker - Normal: 0.5-1.1</div>
+                            <input type="range" name="creatinine" id="creatinine" min="0.5" max="10" value="1.0" step="0.1">
+                            <div class="range-guide"><span>0.5</span><span>10</span></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-label"><span>BUN (mg/dL)</span><span class="input-value" id="bun-val">15</span></div>
+                            <div class="input-description">Blood urea nitrogen - Normal: 7-20</div>
+                            <input type="range" name="bun" id="bun" min="5" max="100" value="15" step="1">
+                            <div class="range-guide"><span>5</span><span>100</span></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-label">Proteinuria Level</div>
+                            <div class="input-description">Protein in urine - indicator of kidney damage</div>
+                            <select name="proteinuria" id="proteinuria"><option value="0">None</option><option value="1">Trace</option><option value="2">Mild</option><option value="3">Moderate</option><option value="4">Severe</option></select>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-label"><span>Glucose (mg/dL)</span><span class="input-value" id="glucose-val">90</span></div>
+                            <div class="input-description">Blood glucose level - Normal: 70-100</div>
+                            <input type="range" name="glucose" id="glucose" min="50" max="300" value="90" step="1">
+                            <div class="range-guide"><span>50</span><span>300</span></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-label"><span>Albumin (g/dL)</span><span class="input-value" id="albumin-val">4.0</span></div>
+                            <div class="input-description">Protein level - Normal: 3.5-5.5</div>
+                            <input type="range" name="albumin" id="albumin" min="2" max="6" value="4.0" step="0.1">
+                            <div class="range-guide"><span>2</span><span>6</span></div>
+                        </div>
+                        <button type="submit" class="submit-btn">🔍 Analyze Kidney Health</button>
+                    </form>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">📊 Kidney Function Assessment</div>
+                    <canvas id="riskChart"></canvas>
+                    <div class="risk-preview">
+                        <div class="risk-label">Estimated Risk Level</div>
+                        <div class="risk-value" id="riskPreview">28%</div>
+                        <div class="input-description" style="margin-top: 8px;" id="riskStatus">Low Risk</div>
+                    </div>
+                    <div style="margin-top: 24px; background: rgba(251,191,36,0.1); border: 1px solid var(--border); border-radius: 12px; padding: 16px;">
+                        <div style="font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--accent3);">📌 Kidney Health Factors:</div>
+                        <div style="color: var(--muted); font-size: 12px; line-height: 1.6;">
+                            <p>✓ Creatinine and BUN key indicators</p>
+                            <p>✓ Blood pressure affects kidney function</p>
+                            <p>✓ Proteinuria suggests damage</p>
+                            <p>✓ Albumin levels reflect protein loss</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        const ranges = ['age', 'bp', 'creatinine', 'bun', 'glucose', 'albumin'];
+        ranges.forEach(id => {
+            const input = document.getElementById(id);
+            const val = document.getElementById(id + '-val');
+            input.addEventListener('input', function() {
+                const displayValue = ['creatinine', 'albumin'].includes(id) ? parseFloat(this.value).toFixed(1) : this.value;
+                val.textContent = displayValue;
+                updateRiskPreview();
+            });
+        });
+        function updateRiskPreview() {
+            const creatinine = parseFloat(document.getElementById('creatinine').value);
+            const bun = parseInt(document.getElementById('bun').value);
+            const proteinuria = parseInt(document.getElementById('proteinuria').value);
+            const bp = parseInt(document.getElementById('bp').value);
+            let risk = 15;
+            risk += (creatinine - 0.5) / 9.5 * 30;
+            risk += (bun - 5) / 95 * 20;
+            risk += proteinuria * 12;
+            risk += (bp - 80) / 120 * 15;
+            risk = Math.min(95, Math.max(5, Math.round(risk)));
+            document.getElementById('riskPreview').textContent = risk + '%';
+            let status = 'Low Risk';
+            if (risk >= 70) status = 'High Risk';
+            else if (risk >= 40) status = 'Medium Risk';
+            document.getElementById('riskStatus').textContent = status;
+            createChart(risk);
+        }
+        function createChart(risk) {
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            if (window.riskChartInstance) window.riskChartInstance.destroy();
+            window.riskChartInstance = new Chart(ctx, {
+                type: 'doughnut', data: {
+                    datasets: [{
+                        data: [risk, 100 - risk],
+                        backgroundColor: [
+                            risk < 40 ? '#34d399' : risk < 70 ? '#fbbf24' : '#f87171',
+                            'rgba(255,255,255,0.08)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true, cutout: '70%', plugins: { legend: { display: false } } }
+            });
+        }
+        updateRiskPreview();
+        document.getElementById('kidneyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            btn.textContent = '⏳ Analyzing...';
+            btn.disabled = true;
+            setTimeout(() => { this.submit(); }, 500);
+        });
+    </script>
+</body>
+</html>

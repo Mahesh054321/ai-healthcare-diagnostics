@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Symptom Checker - MedAI Diagnostics</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap");
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0b0f1a;
+            --bg2: #111827;
+            --bg3: #1a2236;
+            --border: rgba(99,130,220,0.18);
+            --border2: rgba(99,130,220,0.35);
+            --accent: #4f7cff;
+            --accent2: #38e2d4;
+            --accent3: #f87171;
+            --accent4: #fbbf24;
+            --text: #e8edf7;
+            --muted: #7a8ab0;
+            --success: #34d399;
+            --warn: #fbbf24;
+            --danger: #f87171;
+            --font: "DM Sans", sans-serif;
+            --mono: "Space Mono", monospace;
+        }
+
+        body {
+            font-family: var(--font);
+            background: linear-gradient(135deg, var(--bg) 0%, #0f1623 50%, #0a0d15 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app { 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+        }
+
+        .header {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .logo-icon { 
+            font-size: 28px; 
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover { 
+            background: var(--bg3); 
+            color: var(--text);
+            transform: translateX(-4px);
+        }
+
+        .main {
+            flex: 1;
+            padding: 40px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .page-subtitle {
+            color: var(--muted);
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-wrapper {
+            background: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .symptom-category {
+            background: linear-gradient(135deg, rgba(79, 124, 255, 0.05) 0%, rgba(56, 226, 212, 0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(0);
+            perspective: 1000px;
+        }
+
+        .symptom-category::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent);
+            transition: left 0.5s;
+            pointer-events: none;
+        }
+
+        .symptom-category:hover {
+            transform: translateY(-8px) translateZ(0);
+            border-color: var(--accent);
+            box-shadow: 0 12px 32px rgba(79, 124, 255, 0.15),
+                        inset 0 0px 20px rgba(79, 124, 255, 0.05);
+            background: linear-gradient(135deg, rgba(79, 124, 255, 0.1) 0%, rgba(56, 226, 212, 0.08) 100%);
+        }
+
+        .symptom-category:hover::before {
+            left: 100%;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            box-shadow: 0 4px 12px rgba(79, 124, 255, 0.3);
+        }
+
+        .category-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .symptom-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .symptom-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .symptom-item:hover {
+            background: rgba(79, 124, 255, 0.1);
+        }
+
+        .symptom-checkbox {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .symptom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .symptom-checkbox-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+            border-radius: 6px;
+            background: transparent;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .symptom-checkbox input:checked ~ .symptom-checkbox-label {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-color: var(--accent2);
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 0 12px rgba(79, 124, 255, 0.5);
+        }
+
+        .symptom-checkbox input:checked ~ .symptom-checkbox-label::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            animation: checkAnimate 0.3s ease-out;
+        }
+
+        @keyframes checkAnimate {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .symptom-label {
+            flex: 1;
+            font-size: 14px;
+            color: var(--text);
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+
+        .symptom-item:hover .symptom-label {
+            color: var(--accent);
+        }
+
+        .selected-symptoms {
+            background: rgba(56, 226, 212, 0.05);
+            border: 1px solid rgba(56, 226, 212, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 32px;
+            min-height: 60px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .selected-symptoms.empty::after {
+            content: 'Select symptoms to begin analysis...';
+            color: var(--muted);
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .symptom-tag {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            animation: tagPop 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(79, 124, 255, 0.3);
+        }
+
+        @keyframes tagPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .symptom-tag button {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            margin-left: 4px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .symptom-tag button:hover {
+            opacity: 1;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .btn-custom {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-analyze {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-analyze::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.5s;
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(79, 124, 255, 0.4);
+        }
+
+        .btn-analyze:hover::before {
+            left: 100%;
+        }
+
+        .btn-back {
+            background: var(--bg3);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-back:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .symptom-count {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent3), var(--danger));
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+        }
+
+        .analysis-info {
+            background: linear-gradient(135deg, rgba(79, 124, 255, 0.1), rgba(56, 226, 212, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .analysis-info-icon {
+            color: var(--accent);
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .analysis-info-text {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .form-wrapper {
+                padding: 24px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .symptoms-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .main {
+                padding: 20px 16px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <a href="/" class="logo">
+                <div class="logo-icon">🏥</div>
+                <span class="logo-text">MedAI Diagnostics</span>
+            </a>
+            <a href="/" class="nav-btn">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </header>
+
+        <main class="main">
+            <div class="page-header">
+                <h1 class="page-title">🩺 Smart Symptom Analyzer</h1>
+                <p class="page-subtitle">Describe your symptoms for AI-powered initial assessment. This is not a substitute for professional medical diagnosis.</p>
+            </div>
+
+            <div class="form-wrapper">
+                <div class="analysis-info">
+                    <div class="analysis-info-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="analysis-info-text">
+                        Select all symptoms you're currently experiencing. Our AI will analyze the pattern to suggest which health condition may require attention. Always consult a healthcare professional for proper diagnosis.
+                    </div>
+                </div>
+
+                <form method="POST" id="symptomForm">
+                    <div class="selected-symptoms empty" id="selectedSymptoms">
+                    </div>
+
+                    <div class="symptoms-grid">
+                        <!-- General Symptoms -->
+                        <div class="symptom-category">
+                            <div class="category-header">
+                                <div class="category-icon">👤</div>
+                                <div class="category-title">General Symptoms</div>
+                            </div>
+                            <div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Fever" id="fever">
+                                        <label for="fever" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="fever" class="symptom-label">🌡️ Fever</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Fatigue" id="fatigue">
+                                        <label for="fatigue" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="fatigue" class="symptom-label">😴 Fatigue</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Weight Loss" id="weight_loss">
+                                        <label for="weight_loss" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="weight_loss" class="symptom-label">⚖️ Weight Loss</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Headache" id="headache">
+                                        <label for="headache" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="headache" class="symptom-label">🤕 Headache</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Dizziness" id="dizziness">
+                                        <label for="dizziness" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="dizziness" class="symptom-label">🌀 Dizziness</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Respiratory Symptoms -->
+                        <div class="symptom-category">
+                            <div class="category-header">
+                                <div class="category-icon">💨</div>
+                                <div class="category-title">Respiratory Symptoms</div>
+                            </div>
+                            <div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Cough" id="cough">
+                                        <label for="cough" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="cough" class="symptom-label">😷 Cough</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Shortness of Breath" id="breath">
+                                        <label for="breath" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="breath" class="symptom-label">💨 Shortness of Breath</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Chest Pain" id="chest_pain">
+                                        <label for="chest_pain" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="chest_pain" class="symptom-label">❤️ Chest Pain</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Wheezing" id="wheezing">
+                                        <label for="wheezing" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="wheezing" class="symptom-label">🌪️ Wheezing</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Sore Throat" id="sore_throat">
+                                        <label for="sore_throat" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="sore_throat" class="symptom-label">🗣️ Sore Throat</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Digestive Symptoms -->
+                        <div class="symptom-category">
+                            <div class="category-header">
+                                <div class="category-icon">🍽️</div>
+                                <div class="category-title">Digestive Symptoms</div>
+                            </div>
+                            <div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Nausea" id="nausea">
+                                        <label for="nausea" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="nausea" class="symptom-label">🤢 Nausea</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Vomiting" id="vomiting">
+                                        <label for="vomiting" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="vomiting" class="symptom-label">🤮 Vomiting</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Abdominal Pain" id="abdominal">
+                                        <label for="abdominal" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="abdominal" class="symptom-label">🫀 Abdominal Pain</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Jaundice" id="jaundice">
+                                        <label for="jaundice" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="jaundice" class="symptom-label">🟡 Jaundice</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Diarrhea" id="diarrhea">
+                                        <label for="diarrhea" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="diarrhea" class="symptom-label">💧 Diarrhea</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Urinary Symptoms -->
+                        <div class="symptom-category">
+                            <div class="category-header">
+                                <div class="category-icon">💧</div>
+                                <div class="category-title">Urinary Symptoms</div>
+                            </div>
+                            <div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Frequent Urination" id="urination">
+                                        <label for="urination" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="urination" class="symptom-label">🚽 Frequent Urination</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Painful Urination" id="painful_urination">
+                                        <label for="painful_urination" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="painful_urination" class="symptom-label">⚡ Painful Urination</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Dark Urine" id="dark_urine">
+                                        <label for="dark_urine" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="dark_urine" class="symptom-label">🟤 Dark Urine</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cardiovascular Symptoms -->
+                        <div class="symptom-category">
+                            <div class="category-header">
+                                <div class="category-icon">💓</div>
+                                <div class="category-title">Cardiovascular Symptoms</div>
+                            </div>
+                            <div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Palpitations" id="palpitations">
+                                        <label for="palpitations" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="palpitations" class="symptom-label">💓 Palpitations</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Swelling" id="swelling">
+                                        <label for="swelling" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="swelling" class="symptom-label">💪 Swelling (edema)</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="High Blood Pressure" id="high_bp">
+                                        <label for="high_bp" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="high_bp" class="symptom-label">📈 High Blood Pressure</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Neurological Symptoms -->
+                        <div class="symptom-category">
+                            <div class="category-header">
+                                <div class="category-icon">🧠</div>
+                                <div class="category-title">Neurological Symptoms</div>
+                            </div>
+                            <div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Confusion" id="confusion">
+                                        <label for="confusion" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="confusion" class="symptom-label">🤔 Confusion</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Memory Loss" id="memory_loss">
+                                        <label for="memory_loss" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="memory_loss" class="symptom-label">🧩 Memory Loss</label>
+                                </div>
+                                <div class="symptom-item">
+                                    <div class="symptom-checkbox">
+                                        <input type="checkbox" name="symptoms" value="Tremors" id="tremors">
+                                        <label for="tremors" class="symptom-checkbox-label"></label>
+                                    </div>
+                                    <label for="tremors" class="symptom-label">⚡ Tremors</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-custom btn-back" onclick="window.location.href='/'">
+                            <i class="fas fa-arrow-left"></i> Back to Home
+                        </button>
+                        <button type="submit" class="btn-custom btn-analyze">
+                            <i class="fas fa-flask-vial"></i> Analyze Symptoms
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Track selected symptoms and update the display
+        function updateSelectedSymptoms() {
+            const checked = document.querySelectorAll('input[name="symptoms"]:checked');
+            const container = document.getElementById('selectedSymptoms');
+            
+            if (checked.length === 0) {
+                container.classList.add('empty');
+                container.innerHTML = '';
+            } else {
+                container.classList.remove('empty');
+                container.innerHTML = '';
+                
+                checked.forEach(input => {
+                    const tag = document.createElement('div');
+                    tag.className = 'symptom-tag';
+                    tag.innerHTML = `
+                        ${input.value}
+                        <button type="button" onclick="document.getElementById('${input.id}').click()">×</button>
+                    `;
+                    container.appendChild(tag);
+                });
+                
+                // Add count indicator
+                const count = document.createElement('div');
+                count.className = 'symptom-count';
+                count.textContent = checked.length;
+                container.appendChild(count);
+            }
+        }
+
+        // Add event listeners to all checkboxes
+        document.querySelectorAll('input[name="symptoms"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedSymptoms);
+        });
+
+        // Form submission validation
+        document.getElementById('symptomForm').addEventListener('submit', function(e) {
+            const checked = document.querySelectorAll('input[name="symptoms"]:checked');
+            if (checked.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one symptom to proceed.');
+                return false;
+            }
+        });
+
+        // Initialize on page load
+        updateSelectedSymptoms();
+    </script>
+</body>
+</html>
