@@ -3,10 +3,10 @@ services:
     name: medai-diagnostics
     runtime: python3
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn --bind 0.0.0.0:10000 --workers 2 src.app:app
+    startCommand: cd src && gunicorn --bind 0.0.0.0:10000 --workers 2 app:app
     envVars:
       - key: FLASK_APP
-        value: src/app.py
+        value: app.py
       - key: FLASK_ENV
         value: production
       - key: FLASK_RUN_HOST
