@@ -1,0 +1,15 @@
+.git
+.gitignore
+.github
+README.md
+docs/
+notebooks/
+progress/
+data/
+*.pyc
+__pycache__/
+*.log
+.DS_Store
+.vscode/
+*.md
+!README.md
